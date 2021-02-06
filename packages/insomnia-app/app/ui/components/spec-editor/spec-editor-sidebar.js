@@ -8,6 +8,8 @@ import YAMLSourceMap from 'yaml-source-map';
 import { Sidebar } from 'insomnia-components';
 import type { ApiSpec } from '../../../models/api-spec';
 import { trackEvent } from '../../../common/analytics';
+import { showModal } from '../modals';
+import SchemaDesignerModal from '../modals/schema-designer-modal';
 
 type Props = {|
   apiSpec: ApiSpec,
@@ -78,6 +80,24 @@ class SpecEditorSidebar extends React.Component<Props, State> {
     this._mapPosition(itemPath);
   };
 
+  _handleAddItem = (...itemPath): void => {
+    console.log('item to add', itemPath);
+  };
+
+  _handleEditItem = (...itemPath): void => {
+    const schema = this._getSchema(itemPath);
+    console.log('edit', schema);
+    showModal(SchemaDesignerModal, { schema });
+  };
+
+  _getSchema = (itemPath: Array): Object => {
+    let spec = this.getSpec();
+    itemPath.forEach(path => {
+      spec = spec && spec[path];
+    });
+    return spec;
+  };
+
   componentDidMount() {
     const { contents } = this.props.apiSpec;
     try {
@@ -89,17 +109,27 @@ class SpecEditorSidebar extends React.Component<Props, State> {
     this.setState({ specContentJSON: true });
   }
 
+  getSpec(): Object {
+    const { apiSpec } = this.props;
+    return YAML.parse(apiSpec.contents);
+  }
+
   render() {
     const { error } = this.state;
     if (error) {
       return <p className="notice error margin-sm">{error}</p>;
     }
 
-    const specJSON = YAML.parse(this.props.apiSpec.contents);
+    const specJSON = this.getSpec();
 
     return (
       <StyledSpecEditorSidebar>
-        <Sidebar jsonData={specJSON} onClick={this._handleItemClick} />
+        <Sidebar
+          jsonData={specJSON}
+          onClick={this._handleItemClick}
+          onAdd={this._handleAddItem}
+          onEdit={this._handleEditItem}
+        />
       </StyledSpecEditorSidebar>
     );
   }

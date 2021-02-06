@@ -44,6 +44,7 @@ import RequestCreateModal from './modals/request-create-modal';
 import RequestSwitcherModal from './modals/request-switcher-modal';
 import SettingsModal from './modals/settings-modal';
 import FilterHelpModal from './modals/filter-help-modal';
+import SchemaDesignerModal from './modals/schema-designer-modal';
 import RequestSettingsModal from './modals/request-settings-modal';
 import SyncStagingModal from './modals/sync-staging-modal';
 import GitRepositorySettingsModal from './modals/git-repository-settings-modal';
@@ -591,6 +592,7 @@ class Wrapper extends React.PureComponent<WrapperProps, State> {
             <PaymentNotificationModal ref={registerModal} />
             <FilterHelpModal ref={registerModal} />
             <RequestRenderErrorModal ref={registerModal} />
+            <SchemaDesignerModal ref={registerModal} />
             <GenerateConfigModal ref={registerModal} settings={settings} />
 
             <CodePromptModal

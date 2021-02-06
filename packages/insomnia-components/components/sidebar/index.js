@@ -22,6 +22,7 @@ type Props = {|
   className?: string,
   jsonData: Object,
   onClick: (section: string, path: any) => void,
+  onEdit: (section: string, path: any) => void,
   jsonData: {
     servers?: Object,
     info?: Object,
@@ -141,7 +142,9 @@ function Sidebar(props: Props) {
         <SidebarParameters parameters={parameters} onClick={props.onClick} />
       )}
       {headersVisible && headers && <SidebarHeaders headers={headers} onClick={props.onClick} />}
-      {schemasVisible && schemas && <SidebarSchemas schemas={schemas} onClick={props.onClick} />}
+      {schemasVisible && schemas && (
+        <SidebarSchemas schemas={schemas} onClick={props.onClick} onEdit={props.onEdit} />
+      )}
       {securityVisible && securitySchemes && (
         <SidebarSecurity security={securitySchemes} onClick={props.onClick} />
       )}
