@@ -6,6 +6,7 @@ import * as db from '../../../common/database';
 import { API_BASE_URL, getClientString } from '../../../common/constants';
 import { isLoggedIn, onLoginLogout } from '../../../account/session';
 import * as fetch from '../../../account/fetch';
+import * as schemaDesigner from './schema-designer';
 
 export async function init() {
   const store = configureStore();
@@ -40,4 +41,5 @@ export async function init() {
 export const reducer = combineReducers({
   entities: entities.reducer,
   global: global.reducer,
+  schemaDesigner: schemaDesigner.reducer,
 });
