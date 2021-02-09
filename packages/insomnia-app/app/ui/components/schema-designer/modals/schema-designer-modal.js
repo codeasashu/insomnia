@@ -2,12 +2,14 @@
 
 import React, { PureComponent } from 'react';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import { AUTOBIND_CFG } from '../../../common/constants';
+import { AUTOBIND_CFG } from '../../../../common/constants';
 
-import Modal from '../base/modal';
-import ModalBody from '../base/modal-body';
-import ModalHeader from '../base/modal-header';
-import ModalFooter from '../base/modal-footer';
+import Modal from '../../base/modal';
+import ModalBody from '../../base/modal-body';
+import ModalHeader from '../../base/modal-header';
+import ModalFooter from '../../base/modal-footer';
+
+import SchemaDesignerApp from '../schema-designer';
 
 @autoBindMethodsForReact(AUTOBIND_CFG)
 class SchemaDesignerModal extends PureComponent {
@@ -34,7 +36,7 @@ class SchemaDesignerModal extends PureComponent {
       <Modal ref={this._setModalRef}>
         <ModalHeader>Schema Designer</ModalHeader>
         <ModalBody className="wide pad">
-          <p>This is schema designer</p>
+          <SchemaDesignerApp />
         </ModalBody>
         <ModalFooter>
           <div>

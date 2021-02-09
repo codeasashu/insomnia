@@ -9,7 +9,7 @@ import { Sidebar } from 'insomnia-components';
 import type { ApiSpec } from '../../../models/api-spec';
 import { trackEvent } from '../../../common/analytics';
 import { showModal } from '../modals';
-import SchemaDesignerModal from '../modals/schema-designer-modal';
+import SchemaDesignerModal from '../schema-designer/modals/schema-designer-modal';
 
 type Props = {|
   apiSpec: ApiSpec,
