@@ -96,9 +96,7 @@ class SchemaArrayComponent extends PureComponent {
     this.props.changeValue({ key, value });
   };
 
-  _noop = e => {
-    console.log('clicked');
-  };
+  _noop = e => {};
 
   // 增加子节点
   handleAddChildField = () => {
@@ -156,7 +154,7 @@ class SchemaArrayComponent extends PureComponent {
                   ) : null}
                 </Col>
                 <Col span={22}>
-                  <Input disabled value="Items" onChange={this._noop} />
+                  <Input className="form-control" disabled value="Items" onChange={this._noop} />
                   <ToggleSwitch disabled />
                 </Col>
               </Row>
@@ -178,6 +176,7 @@ class SchemaArrayComponent extends PureComponent {
             </Col>
             <Col span={5} className="col-item col-item-mock">
               <Input
+                className="form-control"
                 placeholder={LocaleProvider('title')}
                 value={items.title}
                 onChange={this.handleChangeTitle}
@@ -185,6 +184,7 @@ class SchemaArrayComponent extends PureComponent {
             </Col>
             <Col span={5} className="col-item col-item-desc">
               <Input
+                className="form-control"
                 placeholder={LocaleProvider('description')}
                 value={items.description}
                 onChange={this.handleChangeDesc}
@@ -321,16 +321,15 @@ class SchemaItemComponent extends PureComponent {
 
   render() {
     const { name, data, prefix, open, showEdit, showAdv } = this.props;
-    const value = Object.assign({}, data.properties[name], { title: null, description: null });
+    const value = Object.assign({}, { title: '', description: '' }, data.properties[name]);
     const prefixArray = [].concat(prefix, name);
-    console.log('show', open, prefix, name);
     const show = _.get(open, prefix);
     const showIcon = _.get(open, [].concat(prefix, name, 'properties'));
-
+    const indentLength = prefix.filter(name => name !== 'properties').length;
     // let show = true;
     // let showIcon = true;
     return show ? (
-      <ListGroupItem>
+      <ListGroupItem indentLevel={indentLength}>
         <Row type="flex" justify="space-around" align="middle">
           <Col
             span={8}
@@ -374,6 +373,7 @@ class SchemaItemComponent extends PureComponent {
 
           <Col span={5} className="col-item col-item-mock">
             <Input
+              className="form-control"
               placeholder={LocaleProvider('title')}
               value={value.title}
               onChange={this.handleChangeTitle}
@@ -382,6 +382,7 @@ class SchemaItemComponent extends PureComponent {
 
           <Col span={5} className="col-item col-item-desc">
             <Input
+              className="form-control"
               placeholder={LocaleProvider('description')}
               value={value.description}
               onChange={this.handleChangeDesc}
@@ -422,7 +423,6 @@ const SchemaItem = connect(({ schemaDesigner }) => {
 class SchemaObjectComponent extends Component {
   render() {
     const { data, prefix, showEdit, showAdv } = this.props;
-    console.log('got into obj', data, prefix);
     return (
       <ListGroup className="object-style">
         {Object.keys(data.properties).map((name, index) => {
@@ -478,7 +478,6 @@ const DropPlusComponent = (props, context) => {
 const DropPlus = connect(null, mapDispatchToProps)(DropPlusComponent);
 
 const SchemaJsonComponent = ({ schema, showEdit, showAdv }) => {
-  console.log('incomp', schema);
   const item = mapping([], schema, showEdit, showAdv);
   return <ListGroupItem className="schema-content">{item}</ListGroupItem>;
 };

@@ -207,10 +207,17 @@ const _handleChangeName = (state, { keys, name, value }) => {
 };
 
 const _handleChangeValue = (state, { keys, value }) => {
+  const clonedState = _.clone(state);
   if (value) {
-    return _.set(state, keys, value);
+    const parentKeys = getParentKey(keys);
+    const parentData = parentKeys.length ? _.get(state, parentKeys) : state;
+    const lastKey = _.last(keys);
+    return _.set(clonedState, parentKeys, {
+      ...parentData,
+      ...{ [lastKey]: value },
+    });
   } else {
-    return _handleDelete(state, keys);
+    return _handleDelete(clonedState, keys);
   }
 };
 
