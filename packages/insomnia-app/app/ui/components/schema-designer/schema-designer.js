@@ -35,27 +35,29 @@ class SchemaDesigner extends React.Component {
     this.jsonData = null;
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (typeof this.props.onChange === 'function' && this.props.schema !== nextProps.schema) {
-      const oldData = JSON.stringify(this.props.schema || '');
-      const newData = JSON.stringify(nextProps.schema || '');
-      if (oldData !== newData) return this.props.onChange(newData);
+  componentDidUpdate(oldProps) {
+    if (typeof this.props.onChange === 'function' && this.props.schema !== oldProps.schema) {
+      const newData = this.props.schema || '';
+      const oldData = oldProps.schema || '';
+      console.log('updatedata', newData, oldData);
+      if (!_.isEqual(oldData, newData)) return this.props.onChange(newData);
     }
-    if (this.props.data && this.props.data !== nextProps.data) {
-      this.props.changeEditorSchema({ value: JSON.parse(nextProps.data) });
+    if (this.props.data && this.props.data !== oldProps.data) {
+      this.props.changeEditorSchema({ value: this.props.data });
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     let data = this.props.data;
     if (!data) {
-      data = `{
-        "type": "object",
-        "title": "title",
-        "properties":{}
-      }`;
+      data = {
+        type: 'object',
+        title: 'title',
+        properties: {},
+      };
     }
-    this.props.changeEditorSchema({ value: JSON.parse(data) });
+    console.log('initdata', data);
+    this.props.changeEditorSchema({ value: data });
   }
 
   getChildContext() {
@@ -199,7 +201,9 @@ class SchemaDesigner extends React.Component {
                   ) : null}
                 </Col>
                 <Col span={22}>
-                  <Input disabled value="root" />
+                  <div style={{ position: 'relative' }}>
+                    <Input onChange={e => {}} className="form-control" disabled value="root" />
+                  </div>
                   <Tooltip placement="top" title={'checked_all'}>
                     <ToggleSwitch
                       checked={checked}
@@ -279,7 +283,7 @@ SchemaDesigner.childContextTypes = {
 };
 
 SchemaDesigner.propTypes = {
-  data: PropTypes.string,
+  data: PropTypes.object,
   onChange: PropTypes.func,
   showEditor: PropTypes.bool,
   isMock: PropTypes.bool,

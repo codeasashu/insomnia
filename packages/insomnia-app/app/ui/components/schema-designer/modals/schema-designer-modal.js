@@ -13,22 +13,33 @@ import SchemaDesignerApp from '../schema-designer';
 
 @autoBindMethodsForReact(AUTOBIND_CFG)
 class SchemaDesignerModal extends PureComponent {
+  state = {
+    schema: {},
+  };
+
   _setModalRef(m) {
     this.modal = m;
   }
 
   _handleOk() {
-    console.log('handledOk');
+    console.log('handledOk', this.state.schema);
   }
 
   hide() {
+    console.log('handleCancel', this.state.schema);
     this.modal.hide();
   }
 
   show({ schema }: Object) {
     // this.setState({ ... });
     console.log('[SchemaDesignerModal]', schema);
+    this.setState({ schema });
     this.modal && this.modal.show();
+  }
+
+  handleChange(schema) {
+    console.log('spec changed', schema);
+    this.setState({ schema });
   }
 
   render() {
@@ -36,7 +47,7 @@ class SchemaDesignerModal extends PureComponent {
       <Modal ref={this._setModalRef}>
         <ModalHeader>Schema Designer</ModalHeader>
         <ModalBody className="wide pad">
-          <SchemaDesignerApp />
+          <SchemaDesignerApp data={this.state.schema} onChange={this.handleChange} />
         </ModalBody>
         <ModalFooter>
           <div>
