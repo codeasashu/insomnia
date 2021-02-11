@@ -1,7 +1,12 @@
 
 .json-schema-react-editor .option-formStyle{
   /* padding-left: 25px; */
-  padding-Top: 8px
+  padding-Top: 8px;
+  padding-left:30px;
+}
+
+.json-schema-react-editor .col input{
+  border-bottom: 1px #ccc solid;
 }
 
 .json-schema-react-editor .required-icon {

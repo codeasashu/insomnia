@@ -115,15 +115,13 @@ const _handleEditorSchemaChange = (state, { value }) => {
 
 const _handleAddChildField = (state, { keys, fieldNum }) => {
   const fieldName = `field_${fieldNum}`;
-  const originalState = _.clone(state);
-  state = _addChildField(state, keys, fieldName);
-  const a = addRequiredFields(originalState, keys, fieldName);
-  console.log('got in dispatch', a);
-  return a;
+  const originalState = _.cloneDeep(state);
+  const newState = _addChildField(originalState, keys, fieldName);
+  return addRequiredFields(newState, keys, fieldName);
 };
 
 const _handleDelete = (state, { keys }) => {
-  const clonedState = _.clone(state);
+  const clonedState = _.cloneDeep(state);
   _.unset(clonedState, keys);
   return clonedState;
 };
@@ -133,7 +131,7 @@ const _handleAddField = (state, { keys, name, fieldNum }) => {
   const propertiesData = _.get(state, keys);
   let newPropertiesData = {};
   const parentKeys = getParentKey(keys);
-  const parentData = parentKeys.length ? _.get(state, parentKeys) : state;
+  const parentData = parentKeys.length ? _.get(state, parentKeys) : clonedState;
   const requiredData = [].concat(parentData.required || []);
 
   const fieldName = `field_${fieldNum}`;
@@ -158,9 +156,9 @@ const _handleAddField = (state, { keys, name, fieldNum }) => {
 };
 
 const _handleChangeType = (state, { keys, value }) => {
-  const parentKeys = getParentKey(keys);
-  const parentData = parentKeys.length ? _.get(state, parentKeys) : state;
   const clonedState = _.cloneDeep(state);
+  const parentKeys = getParentKey(keys);
+  const parentData = parentKeys.length ? _.get(clonedState, parentKeys) : clonedState;
 
   if (parentData.type === value) {
     return clonedState;
@@ -168,13 +166,15 @@ const _handleChangeType = (state, { keys, value }) => {
 
   const description = parentData.description ? { description: parentData.description } : {};
   const newParentDataItem = { ...defaultSchema[value], ...description };
-  return _.set(clonedState, parentKeys, newParentDataItem);
+  console.log('changeType', parentKeys, newParentDataItem);
+  if (parentKeys.length) return _.set(clonedState, parentKeys, newParentDataItem);
+  return _.assign(clonedState, newParentDataItem);
 };
 
 const _handleEnableRequire = (state, { keys, name, required }) => {
   const parentKeys = getParentKey(keys);
   const clonedState = _.cloneDeep(state);
-  const parentData = parentKeys.length ? _.get(state, parentKeys) : state;
+  const parentData = parentKeys.length ? _.get(clonedState, parentKeys) : clonedState;
   const requiredArray = [].concat(parentData.required || []);
   const requiredFieldIndex = requiredArray.indexOf(name);
   const foundRequired = requiredFieldIndex >= 0;
@@ -191,6 +191,9 @@ const _handleEnableRequire = (state, { keys, name, required }) => {
 };
 
 const _handleChangeName = (state, { keys, name, value }) => {
+  if (!value || !value.length) {
+    return state;
+  }
   const clonedState = _.cloneDeep(state);
   const items = _.get(clonedState, keys);
 
@@ -207,10 +210,10 @@ const _handleChangeName = (state, { keys, name, value }) => {
 };
 
 const _handleChangeValue = (state, { keys, value }) => {
-  const clonedState = _.clone(state);
+  const clonedState = _.cloneDeep(state);
   if (value) {
     const parentKeys = getParentKey(keys);
-    const parentData = parentKeys.length ? _.get(state, parentKeys) : state;
+    const parentData = parentKeys.length ? _.get(state, parentKeys) : clonedState;
     const lastKey = _.last(keys);
     return _.set(clonedState, parentKeys, {
       ...parentData,
