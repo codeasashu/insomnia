@@ -11,6 +11,7 @@ import {
   ToggleSwitch,
   ListGroup,
   ListGroupItem,
+  Button,
 } from 'insomnia-components';
 import Input from '../../base/debounced-input';
 import FieldInput from './field-input';
@@ -108,7 +109,6 @@ class SchemaArrayComponent extends PureComponent {
 
   handleClickIcon = () => {
     const prefix = this.getPrefix();
-    // 数据存储在 properties.name.properties下
     const keyArr = [].concat(prefix, 'properties');
     this.props.setOpenValue({ key: keyArr });
   };
@@ -144,13 +144,13 @@ class SchemaArrayComponent extends PureComponent {
               <Row type="flex" justify="space-around" align="middle">
                 <Col span={2} className="down-style-col">
                   {items.type === 'object' ? (
-                    <span className="down-style" onClick={this.handleClickIcon}>
-                      {showIcon ? (
-                        <SvgIcon icon="chevron-down" />
-                      ) : (
-                        <SvgIcon icon="chevron-right" />
-                      )}
-                    </span>
+                    <Button
+                      size="small"
+                      onClick={this.handleClickIcon}
+                      variant="text"
+                      style={!showIcon ? { transform: `rotate(-90deg)` } : {}}>
+                      <SvgIcon icon="chevron-down" />
+                    </Button>
                   ) : null}
                 </Col>
                 <Col span={22}>
@@ -325,92 +325,96 @@ class SchemaItemComponent extends PureComponent {
     const prefixArray = [].concat(prefix, name);
     const show = _.get(open, prefix);
     const showIcon = _.get(open, [].concat(prefix, name, 'properties'));
-    const indentLength = prefix.filter(name => name !== 'properties').length;
-    // let show = true;
-    // let showIcon = true;
+    // const indentLength = prefix.filter(name => name !== 'properties').length;
     return show ? (
-      <ListGroupItem indentLevel={indentLength}>
-        <Row type="flex" justify="space-around" align="middle">
-          <Col
-            span={8}
-            className="col-item name-item col-item-name"
-            style={this.__tagPaddingLeftStyle}>
-            <Row type="flex" justify="space-around" align="middle">
-              <Col span={2} className="down-style-col">
-                {value.type === 'object' ? (
-                  <span className="down-style" onClick={this.handleClickIcon}>
-                    {showIcon ? <SvgIcon icon="chevron-down" /> : <SvgIcon icon="chevron-up" />}
-                  </span>
-                ) : null}
-              </Col>
-              <Col span={22}>
-                <FieldInput onChange={this.handleChangeName} value={name} />
-                <Tooltip placement="top" title={LocaleProvider('required')}>
-                  <ToggleSwitch
-                    checked={
-                      _.isUndefined(data.required) ? false : data.required.indexOf(name) !== -1
-                    }
-                    onChange={this.handleEnableRequire}
-                  />
-                </Tooltip>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={3} className="col-item col-item-type">
-            <select
-              className="type-select-style"
-              onChange={this.handleChangeType}
-              value={value.type}>
-              {SCHEMA_TYPE.map((item, index) => {
-                return (
-                  <option value={item} key={index}>
-                    {item}
-                  </option>
-                );
-              })}
-            </select>
-          </Col>
+      <div style={{ paddingLeft: '30px' }}>
+        <ListGroupItem bordered={false}>
+          <Row type="flex" justify="space-around" align="middle">
+            <Col
+              span={8}
+              className="col-item name-item col-item-name"
+              style={this.__tagPaddingLeftStyle}>
+              <Row type="flex" justify="space-around" align="middle">
+                <Col span={2} className="down-style-col">
+                  {value.type === 'object' ? (
+                    <Button
+                      size="small"
+                      onClick={this.handleClickIcon}
+                      variant="text"
+                      style={!showIcon ? { transform: `rotate(-90deg)` } : {}}>
+                      <SvgIcon icon="chevron-down" />
+                    </Button>
+                  ) : null}
+                </Col>
+                <Col span={22}>
+                  <FieldInput onChange={this.handleChangeName} value={name} />
+                  <Tooltip placement="top" title={LocaleProvider('required')}>
+                    <ToggleSwitch
+                      checked={
+                        _.isUndefined(data.required) ? false : data.required.indexOf(name) !== -1
+                      }
+                      onChange={this.handleEnableRequire}
+                    />
+                  </Tooltip>
+                </Col>
+              </Row>
+            </Col>
+            <Col span={3} className="col-item col-item-type">
+              <select
+                className="type-select-style"
+                onChange={this.handleChangeType}
+                value={value.type}>
+                {SCHEMA_TYPE.map((item, index) => {
+                  return (
+                    <option value={item} key={index}>
+                      {item}
+                    </option>
+                  );
+                })}
+              </select>
+            </Col>
 
-          <Col span={5} className="col-item col-item-mock">
-            <Input
-              className="form-control"
-              placeholder={LocaleProvider('title')}
-              value={value.title}
-              onChange={this.handleChangeTitle}
-            />
-          </Col>
+            <Col span={5} className="col-item col-item-mock">
+              <Input
+                className="form-control"
+                placeholder={LocaleProvider('title')}
+                value={value.title}
+                onChange={this.handleChangeTitle}
+              />
+            </Col>
 
-          <Col span={5} className="col-item col-item-desc">
-            <Input
-              className="form-control"
-              placeholder={LocaleProvider('description')}
-              value={value.description}
-              onChange={this.handleChangeDesc}
-            />
-          </Col>
+            <Col span={5} className="col-item col-item-desc">
+              <Input
+                className="form-control"
+                placeholder={LocaleProvider('description')}
+                value={value.description}
+                onChange={this.handleChangeDesc}
+              />
+            </Col>
 
-          <Col span={3} className="col-item col-item-setting">
-            <span className="adv-set" onClick={this.handleShowAdv}>
-              <Tooltip placement="top" title={LocaleProvider('adv_setting')}>
-                <SvgIcon icon="gear" />
-              </Tooltip>
-            </span>
-            <span className="delete-item" onClick={this.handleDeleteItem}>
-              <SvgIcon icon="trashcan" />
-            </span>
-            {value.type === 'object' ? (
-              <DropPlus prefix={prefix} name={name} />
-            ) : (
-              <span onClick={this.handleAddField}>
-                <Tooltip placement="top" title={LocaleProvider('add_sibling_node')}>
-                  <SvgIcon icon="plus" />
+            <Col span={3} className="col-item col-item-setting">
+              <span className="adv-set" onClick={this.handleShowAdv}>
+                <Tooltip placement="top" title={LocaleProvider('adv_setting')}>
+                  <SvgIcon icon="gear" />
                 </Tooltip>
               </span>
-            )}
-          </Col>
-        </Row>
-        <div className="option-formStyle">{mapping(prefixArray, value, showEdit, showAdv)}</div>
-      </ListGroupItem>
+              <span className="delete-item" onClick={this.handleDeleteItem}>
+                <SvgIcon icon="trashcan" />
+              </span>
+              {value.type === 'object' ? (
+                <DropPlus prefix={prefix} name={name} />
+              ) : (
+                <span onClick={this.handleAddField}>
+                  <Tooltip placement="top" title={LocaleProvider('add_sibling_node')}>
+                    <SvgIcon icon="plus" />
+                  </Tooltip>
+                </span>
+              )}
+            </Col>
+          </Row>
+          <div className="option-formStyle">{mapping(prefixArray, value, showEdit, showAdv)}</div>
+        </ListGroupItem>
+      </div>
     ) : null;
   }
 }
@@ -424,7 +428,7 @@ class SchemaObjectComponent extends Component {
   render() {
     const { data, prefix, showEdit, showAdv } = this.props;
     return (
-      <ListGroup className="object-style">
+      <ListGroup bordered={false} className="object-style">
         {Object.keys(data.properties).map((name, index) => {
           return (
             <SchemaItem
@@ -479,7 +483,11 @@ const DropPlus = connect(null, mapDispatchToProps)(DropPlusComponent);
 
 const SchemaJsonComponent = ({ schema, showEdit, showAdv }) => {
   const item = mapping([], schema, showEdit, showAdv);
-  return <ListGroupItem className="schema-content">{item}</ListGroupItem>;
+  return (
+    <ListGroupItem bordered={false} className="schema-content">
+      {item}
+    </ListGroupItem>
+  );
 };
 
 const SchemaJson = connect(({ schemaDesigner }) => {

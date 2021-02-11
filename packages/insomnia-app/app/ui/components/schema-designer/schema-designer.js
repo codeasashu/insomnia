@@ -5,7 +5,14 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as schemaDesignerActions from '../../redux/modules/schema-designer';
 
-import { SvgIcon, Tooltip, ToggleSwitch, ListGroup, ListGroupItem } from 'insomnia-components';
+import {
+  Button,
+  SvgIcon,
+  Tooltip,
+  ToggleSwitch,
+  ListGroup,
+  ListGroupItem,
+} from 'insomnia-components';
 import Input from '../base/debounced-input';
 
 import './schema-designer.css';
@@ -75,8 +82,8 @@ class SchemaDesigner extends React.Component {
     // return message.error(LocaleProvider('valid_json'));
   };
 
-  changeType = (key, value) => {
-    this.props.changeType({ key: [key], value });
+  changeType = (key, e) => {
+    this.props.changeType({ keys: [key], value: e.target.value });
   };
 
   addChildField = key => {
@@ -185,19 +192,19 @@ class SchemaDesigner extends React.Component {
           </Modal>
         )} */}
 
-        <ListGroup>
-          <ListGroupItem indentLevel={0}>
+        <ListGroup bordered={false}>
+          <ListGroupItem bordered={false} indentLevel={0}>
             <Col span={8} className="col-item name-item col-item-name">
               <Row type="flex" justify="space-around" align="middle">
                 <Col span={2} className="down-style-col">
                   {schema.type === 'object' ? (
-                    <span className="down-style" onClick={this.clickIcon}>
-                      {this.state.show ? (
-                        <SvgIcon icon="chevron-down" />
-                      ) : (
-                        <SvgIcon icon="chevron-up" />
-                      )}
-                    </span>
+                    <Button
+                      size="small"
+                      onClick={this.clickIcon}
+                      variant="text"
+                      style={!this.state.show ? { transform: `rotate(-90deg)` } : {}}>
+                      <SvgIcon icon="chevron-down" />
+                    </Button>
                   ) : null}
                 </Col>
                 <Col span={22}>
@@ -268,7 +275,7 @@ class SchemaDesigner extends React.Component {
               ) : null}
             </Col>
           </ListGroupItem>
-          <SchemaJson showEdit={this.showEdit} showAdv={this.showAdv} />
+          {this.state.show && <SchemaJson showEdit={this.showEdit} showAdv={this.showAdv} />}
         </ListGroup>
       </div>
     );
