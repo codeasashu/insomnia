@@ -8,15 +8,7 @@ import DropPlus from '../ui/drop-plus';
 import SchemaSelectors from './schema-selectors';
 import FieldInput from './field-input';
 
-const AUTOBIND_CFG = {
-  methodsToIgnore: [
-    'UNSAFE_componentWillMount',
-    'UNSAFE_componentWillReceiveProps',
-    'UNSAFE_componentWillUpdate',
-  ],
-};
-
-@autoBindMethodsForReact(AUTOBIND_CFG)
+@autoBindMethodsForReact()
 class SchemaRow extends React.PureComponent {
   _handleAddField(e) {
     const { fieldPrefix, fieldName } = this.props;
