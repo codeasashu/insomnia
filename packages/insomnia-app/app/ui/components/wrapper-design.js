@@ -139,6 +139,17 @@ class WrapperDesign extends React.PureComponent<Props, State> {
     }
   }
 
+  _handleSpecUpdate(contents: string) {
+    const editor = this.editor;
+
+    if (!editor) {
+      return;
+    }
+
+    this.editor._codemirrorSetValue(contents);
+    this._handleOnChange(contents);
+  }
+
   _renderEditor(): React.Node {
     const { activeApiSpec, settings } = this.props.wrapperProps;
     const { lintMessages } = this.state;
@@ -251,7 +262,11 @@ class WrapperDesign extends React.PureComponent<Props, State> {
             </p>
           </div>
         )}>
-        <SpecEditorSidebar apiSpec={activeApiSpec} handleSetSelection={this._handleSetSelection} />
+        <SpecEditorSidebar
+          apiSpec={activeApiSpec}
+          handleSetSelection={this._handleSetSelection}
+          handleSpecUpdate={this._handleSpecUpdate}
+        />
       </ErrorBoundary>
     );
   }

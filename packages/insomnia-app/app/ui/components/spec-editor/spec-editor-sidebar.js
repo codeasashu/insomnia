@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
 import { AUTOBIND_CFG } from '../../../common/constants';
 import YAML from 'yaml';
@@ -81,13 +82,33 @@ class SpecEditorSidebar extends React.Component<Props, State> {
   };
 
   _handleAddItem = (...itemPath): void => {
-    console.log('item to add', itemPath);
+    console.log('not implemented');
   };
 
   _handleEditItem = (...itemPath): void => {
+    const { handleSpecUpdate } = this.props;
     const schema = this._getSchema(itemPath);
-    console.log('edit', schema);
-    showModal(SchemaDesignerModal, { schema });
+    showModal(SchemaDesignerModal, {
+      schema,
+      handleOnUpdate: updatedSchema => {
+        const spec = this.getSpec();
+        const uspec = _.set(spec, itemPath, updatedSchema);
+        const updatedYamlSpec = YAML.stringify(uspec);
+        handleSpecUpdate(updatedYamlSpec);
+        this._mapPosition(itemPath);
+      },
+    });
+  };
+
+  _updateSpec = (itemPath: Array, schema: Object): Object => {
+    let spec = this.getSpec();
+    let clonedSpec = Object.assign({}, spec);
+    itemPath.forEach(path => {
+      spec = spec && spec[path];
+    });
+    spec = schema;
+    clonedSpec = spec;
+    return clonedSpec;
   };
 
   _getSchema = (itemPath: Array): Object => {

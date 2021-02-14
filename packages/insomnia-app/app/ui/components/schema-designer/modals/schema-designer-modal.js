@@ -21,19 +21,21 @@ class SchemaDesignerModal extends PureComponent {
   }
 
   _handleOk() {
-    console.log('handledOk', this.state.schema);
+    this.modal.hide();
+    if (typeof this._handleOnUpdate === 'function') {
+      this._handleOnUpdate(this.state.schema);
+    }
   }
 
   hide() {
-    console.log('handleCancel', this.state.schema);
     this.modal.hide();
   }
 
-  show({ schema }: Object) {
-    // this.setState({ ... });
+  show({ schema, handleOnUpdate }: Object) {
     console.log('[SchemaDesignerModal]', schema);
     this.setState({ schema });
     this.modal && this.modal.show();
+    this._handleOnUpdate = handleOnUpdate;
   }
 
   handleChange(schema) {
