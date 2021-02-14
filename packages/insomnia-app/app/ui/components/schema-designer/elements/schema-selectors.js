@@ -77,7 +77,6 @@ class SchemaSelectors extends React.PureComponent {
                 </SchemaTypeItem>
               );
             })}
-            <SchemaTypeItem onClick={handleItemClick}>$ref</SchemaTypeItem>
           </SchemaTypeRow>
         </SchemaTypeRow>
       </SchemaTypeWrapper>
