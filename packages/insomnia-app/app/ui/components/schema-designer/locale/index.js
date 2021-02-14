@@ -1,4 +1,4 @@
-import { lang } from '../utils';
+export const lang = 'en_US';
 
 const langs = {
   en_US: {

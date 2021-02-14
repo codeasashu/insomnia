@@ -1,12 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as schemaDesignerActions from '../../redux/modules/schema-designer';
 
 import SchemaRow from './elements/schema-row';
-import SchemaJson from './elements/schema-json.js';
+import SchemaJson from './elements/schema-json';
 
 class SchemaDesigner extends React.Component {
   constructor(props) {
@@ -113,7 +110,14 @@ class SchemaDesigner extends React.Component {
           handleDescription={this.props.changeValue}
           handleSettings={this.showAdv}
         />
-        {this.state.show && <SchemaJson showEdit={this.showEdit} showAdv={this.showAdv} />}
+        {this.state.show && (
+          <SchemaJson
+            wrapperProps={{
+              ...this.props,
+              ...{ showEdit: this.showEdit, showAdv: this.showAdv },
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -126,25 +130,4 @@ SchemaDesigner.propTypes = {
   isMock: PropTypes.bool,
 };
 
-const mapStateToProps = ({ schemaDesigner }) => {
-  const { schema, open } = schemaDesigner;
-  return { schema, open };
-};
-
-const mapDispatchToProps = dispatch => {
-  const schema = bindActionCreators(schemaDesignerActions, dispatch);
-  return {
-    changeEditorSchema: schema.changeEditorSchema,
-    changeName: schema.changeName,
-    changeValue: schema.changeValue,
-    changeType: schema.changeType,
-    enableRequire: schema.enableRequire,
-    requireAll: schema.requireAll,
-    deleteItem: schema.deleteItem,
-    addField: schema.addField,
-    addChildField: schema.addChildField,
-    setOpenValue: schema.setOpenValue,
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SchemaDesigner);
+export default SchemaDesigner;
