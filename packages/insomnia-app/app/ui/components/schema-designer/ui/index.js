@@ -34,7 +34,10 @@ export const StyledNavigate = styled(StyledActions)`
 export const FlexRow = styled.div`
   width: 100%;
   display: flex;
-  overflow: hidden;
+
+  input {
+    padding: 1px 13px;
+  }
 `;
 
 export const FlexItem = styled.div`
