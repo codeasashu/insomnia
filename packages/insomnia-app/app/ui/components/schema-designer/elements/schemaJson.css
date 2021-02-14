@@ -61,7 +61,7 @@
   margin-top: 8px;
 }
 
-.json-schema-react-editor .delete-item {
+.json-schema-react-editor .delete-item, .json-schema-react-editor .required-item {
   padding-right: 8px;
 }
 
@@ -137,4 +137,14 @@
   color: #999;
   position: absolute;
   right: 16px;
+}
+
+
+.popover-arrow-border {
+  fill: #10161a;
+  fill-opacity: .1;
+}
+
+.popover-arrow-fill {
+  fill: #fff;
 }

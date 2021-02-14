@@ -2,25 +2,16 @@ import React, { Component, PureComponent } from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-
-import {
-  SvgIcon,
-  Dropdown,
-  DropdownItem,
-  Tooltip,
-  ToggleSwitch,
-  ListGroup,
-  ListGroupItem,
-  Button,
-} from 'insomnia-components';
+import { SvgIcon, Dropdown, DropdownItem, Tooltip, Button } from 'insomnia-components';
 import Input from '../../base/debounced-input';
+import SchemaSelectors from './schema-selectors';
 import FieldInput from './field-input';
 import { Row, Col } from './design';
+import * as ui from '../ui';
 
 import * as schemaDesignerActions from '../../../redux/modules/schema-designer';
 
 import './schemaJson.css';
-import { JSONPATH_JOIN_CHAR, SCHEMA_TYPE } from '../utils';
 import LocaleProvider from '../locale';
 
 const mapping = (name, data, showEdit, showAdv) => {
@@ -70,10 +61,10 @@ class SchemaArrayComponent extends PureComponent {
   }
 
   // 修改数据类型
-  handleChangeType = e => {
+  handleChangeType = type => {
     const prefix = this.getPrefix();
     const keys = [].concat(prefix, 'type');
-    this.props.changeType({ keys, value: e.target.value });
+    this.props.changeType({ keys, value: type });
   };
 
   // 修改备注信息
@@ -130,9 +121,7 @@ class SchemaArrayComponent extends PureComponent {
     const { data, prefix, showEdit, showAdv } = this.props;
     const items = data.items;
     const prefixArray = [].concat(prefix, 'items');
-
-    const prefixArrayStr = [].concat(prefixArray, 'properties').join(JSONPATH_JOIN_CHAR);
-    const showIcon = this.getOpenValue([prefixArrayStr]);
+    const showIcon = this.getOpenValue([].concat(prefixArray, 'properties'));
     return (
       !_.isUndefined(data.items) && (
         <div className="array-type">
@@ -144,35 +133,29 @@ class SchemaArrayComponent extends PureComponent {
               <Row type="flex" justify="space-around" align="middle">
                 <Col span={2} className="down-style-col">
                   {items.type === 'object' ? (
-                    <Button
-                      size="small"
-                      onClick={this.handleClickIcon}
-                      variant="text"
-                      style={!showIcon ? { transform: `rotate(-90deg)` } : {}}>
+                    <ui.StyledNavigate show={showIcon} onClick={this.handleClickIcon}>
                       <SvgIcon icon="chevron-down" />
-                    </Button>
+                    </ui.StyledNavigate>
                   ) : null}
                 </Col>
                 <Col span={22}>
                   <Input className="form-control" disabled value="Items" onChange={this._noop} />
-                  <ToggleSwitch disabled />
                 </Col>
               </Row>
             </Col>
             <Col span={3} className="col-item col-item-type">
-              <select
-                name="itemtype"
-                className="type-select-style"
-                onChange={this.handleChangeType}
-                value={items.type}>
-                {SCHEMA_TYPE.map((item, index) => {
-                  return (
-                    <option value={item} key={index}>
-                      {item}
-                    </option>
-                  );
-                })}
-              </select>
+              <Tooltip
+                message={
+                  <SchemaSelectors
+                    selectedItem={items.type}
+                    handleItemClick={e => this.handleChangeType(e)}
+                  />
+                }
+                position="top">
+                <Button size="small" variant="text">
+                  {items.type}
+                </Button>
+              </Tooltip>
             </Col>
             <Col span={5} className="col-item col-item-mock">
               <Input
@@ -229,7 +212,7 @@ class SchemaItemComponent extends PureComponent {
     const { prefix } = this.props;
     const length = prefix.filter(name => name !== 'properties').length;
     this.__tagPaddingLeftStyle = {
-      paddingLeft: `${20 * (length + 1)}px`,
+      paddingLeft: `${30 * (length + 1)}px`,
     };
   }
 
@@ -270,10 +253,10 @@ class SchemaItemComponent extends PureComponent {
   };
 
   // 修改数据类型
-  handleChangeType = e => {
+  handleChangeType = type => {
     const prefix = this.getPrefix();
     const keys = [].concat(prefix, 'type');
-    this.props.changeType({ keys, value: e.target.value });
+    this.props.changeType({ keys, value: type });
   };
 
   handleDeleteItem = () => {
@@ -283,11 +266,6 @@ class SchemaItemComponent extends PureComponent {
     this.props.enableRequire({ keys: prefix, name, required: false });
   };
 
-  /*
-  展示备注编辑弹窗
-  editorName: 弹窗名称 ['description', 'mock']
-  type: 如果当前字段是object || array showEdit 不可用
-  */
   handleShowEdit = (editorName, type) => {
     const { data, name, showEdit } = this.props;
 
@@ -315,6 +293,7 @@ class SchemaItemComponent extends PureComponent {
 
   // 修改是否必须
   handleEnableRequire = required => {
+    console.log('required', required);
     const { prefix, name } = this.props;
     this.props.enableRequire({ keys: prefix, name, required });
   };
@@ -325,96 +304,71 @@ class SchemaItemComponent extends PureComponent {
     const prefixArray = [].concat(prefix, name);
     const show = _.get(open, prefix);
     const showIcon = _.get(open, [].concat(prefix, name, 'properties'));
+    const isRequired = _.isUndefined(data.required) ? false : data.required.indexOf(name) !== -1;
     // const indentLength = prefix.filter(name => name !== 'properties').length;
     return show ? (
-      <div style={{ paddingLeft: '30px' }}>
-        <ListGroupItem bordered={false}>
-          <Row type="flex" justify="space-around" align="middle">
-            <Col
-              span={8}
-              className="col-item name-item col-item-name"
-              style={this.__tagPaddingLeftStyle}>
-              <Row type="flex" justify="space-around" align="middle">
-                <Col span={2} className="down-style-col">
-                  {value.type === 'object' ? (
-                    <Button
-                      size="small"
-                      onClick={this.handleClickIcon}
-                      variant="text"
-                      style={!showIcon ? { transform: `rotate(-90deg)` } : {}}>
-                      <SvgIcon icon="chevron-down" />
-                    </Button>
-                  ) : null}
-                </Col>
-                <Col span={22}>
-                  <FieldInput onChange={this.handleChangeName} value={name} />
-                  <Tooltip placement="top" title={LocaleProvider('required')}>
-                    <ToggleSwitch
-                      checked={
-                        _.isUndefined(data.required) ? false : data.required.indexOf(name) !== -1
-                      }
-                      onChange={this.handleEnableRequire}
-                    />
-                  </Tooltip>
-                </Col>
-              </Row>
-            </Col>
-            <Col span={3} className="col-item col-item-type">
-              <select
-                className="type-select-style"
-                onChange={this.handleChangeType}
-                value={value.type}>
-                {SCHEMA_TYPE.map((item, index) => {
-                  return (
-                    <option value={item} key={index}>
-                      {item}
-                    </option>
-                  );
-                })}
-              </select>
-            </Col>
+      <>
+        <ui.FlexRow>
+          <ui.FlexItem>
+            {value.type === 'object' ? (
+              <DropPlus prefix={prefix} name={name} />
+            ) : (
+              <ui.StyledActions onClick={this.handleAddField}>
+                <SvgIcon icon="plus" />
+              </ui.StyledActions>
+            )}
+            <ui.FlexItem style={this.__tagPaddingLeftStyle}>
+              {value.type === 'object' && (
+                <ui.StyledNavigate show={showIcon} onClick={this.handleClickIcon}>
+                  <SvgIcon icon="chevron-down" />
+                </ui.StyledNavigate>
+              )}
+              <FieldInput onChange={this.handleChangeName} value={name} />
 
-            <Col span={5} className="col-item col-item-mock">
-              <Input
-                className="form-control"
+              <ui.StyledTooltip
+                message={
+                  <SchemaSelectors
+                    selectedItem={value.type}
+                    handleItemClick={e => this.handleChangeType(e)}
+                  />
+                }
+                position="top">
+                <Button size="small" variant="text">
+                  {value.type}
+                </Button>
+              </ui.StyledTooltip>
+
+              <ui.FieldInput
                 placeholder={LocaleProvider('title')}
                 value={value.title}
                 onChange={this.handleChangeTitle}
               />
-            </Col>
 
-            <Col span={5} className="col-item col-item-desc">
-              <Input
-                className="form-control"
+              <ui.FieldInput
                 placeholder={LocaleProvider('description')}
                 value={value.description}
                 onChange={this.handleChangeDesc}
               />
-            </Col>
-
-            <Col span={3} className="col-item col-item-setting">
-              <span className="adv-set" onClick={this.handleShowAdv}>
-                <Tooltip placement="top" title={LocaleProvider('adv_setting')}>
-                  <SvgIcon icon="gear" />
-                </Tooltip>
-              </span>
-              <span className="delete-item" onClick={this.handleDeleteItem}>
+            </ui.FlexItem>
+            <ui.StyledActions font={1} onClick={this.handleShowAdv}>
+              <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
+                <SvgIcon icon="gear" />
+              </ui.StyledTooltip>
+            </ui.StyledActions>
+            <ui.StyledActions font={1} onClick={this.handleDeleteItem}>
+              <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
                 <SvgIcon icon="trashcan" />
-              </span>
-              {value.type === 'object' ? (
-                <DropPlus prefix={prefix} name={name} />
-              ) : (
-                <span onClick={this.handleAddField}>
-                  <Tooltip placement="top" title={LocaleProvider('add_sibling_node')}>
-                    <SvgIcon icon="plus" />
-                  </Tooltip>
-                </span>
-              )}
-            </Col>
-          </Row>
-          <div className="option-formStyle">{mapping(prefixArray, value, showEdit, showAdv)}</div>
-        </ListGroupItem>
-      </div>
+              </ui.StyledTooltip>
+            </ui.StyledActions>
+            <ui.StyledActions font={1} onClick={() => this.handleEnableRequire(!isRequired)}>
+              <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
+                <SvgIcon theme={isRequired ? 'danger' : 'default'} icon="warning-circle" />
+              </ui.StyledTooltip>
+            </ui.StyledActions>
+          </ui.FlexItem>
+        </ui.FlexRow>
+        {mapping(prefixArray, value, showEdit, showAdv)}
+      </>
     ) : null;
   }
 }
@@ -428,7 +382,7 @@ class SchemaObjectComponent extends Component {
   render() {
     const { data, prefix, showEdit, showAdv } = this.props;
     return (
-      <ListGroup bordered={false} className="object-style">
+      <>
         {Object.keys(data.properties).map((name, index) => {
           return (
             <SchemaItem
@@ -441,7 +395,7 @@ class SchemaObjectComponent extends Component {
             />
           );
         })}
-      </ListGroup>
+      </>
     );
   }
 }
@@ -454,7 +408,12 @@ const SchemaObject = connect(({ schemaDesigner }) => {
 const DropPlusComponent = (props, context) => {
   const { prefix, name, addField, setOpenValue, addChildField } = props;
   const menu = (
-    <Dropdown renderButton={() => <SvgIcon icon="plus" />}>
+    <Dropdown
+      renderButton={() => (
+        <ui.StyledActions height="100%">
+          <SvgIcon icon="plus" />
+        </ui.StyledActions>
+      )}>
       <DropdownItem>
         <span onClick={() => addField({ keys: prefix, name })}>
           {LocaleProvider('sibling_node')}
@@ -473,9 +432,9 @@ const DropPlusComponent = (props, context) => {
   );
 
   return (
-    <Tooltip placement="top" title={LocaleProvider('add_node')}>
+    <ui.StyledTooltip placement="top" message={LocaleProvider('add_node')}>
       {menu}
-    </Tooltip>
+    </ui.StyledTooltip>
   );
 };
 
@@ -483,11 +442,7 @@ const DropPlus = connect(null, mapDispatchToProps)(DropPlusComponent);
 
 const SchemaJsonComponent = ({ schema, showEdit, showAdv }) => {
   const item = mapping([], schema, showEdit, showAdv);
-  return (
-    <ListGroupItem bordered={false} className="schema-content">
-      {item}
-    </ListGroupItem>
-  );
+  return <React.Fragment>{item}</React.Fragment>;
 };
 
 const SchemaJson = connect(({ schemaDesigner }) => {

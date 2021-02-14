@@ -3,28 +3,20 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import SchemaSelectors from './elements/schema-selectors';
 import * as schemaDesignerActions from '../../redux/modules/schema-designer';
 
-import {
-  Button,
-  SvgIcon,
-  Tooltip,
-  ToggleSwitch,
-  ListGroup,
-  ListGroupItem,
-} from 'insomnia-components';
-import Input from '../base/debounced-input';
+import { Button, SvgIcon } from 'insomnia-components';
 
 import './schema-designer.css';
 import SchemaJson from './elements/schema-json.js';
-import { SCHEMA_TYPE, debounce, JSONPATH_JOIN_CHAR } from './utils.js';
 import LocaleProvider from './locale';
-import { Row, Col } from './elements/design';
+import * as ui from './ui';
 
 class SchemaDesigner extends React.Component {
   constructor(props) {
     super(props);
-    this.alterMsg = debounce(this.alterMsg, 2000);
+    this.alterMsg = this.alterMsg.bind(this);
     this.state = {
       visible: false,
       show: true,
@@ -70,7 +62,7 @@ class SchemaDesigner extends React.Component {
   getChildContext() {
     return {
       getOpenValue: keys => {
-        return _.get(this.props.open, keys.join(JSONPATH_JOIN_CHAR));
+        return _.get(this.props.open, keys);
       },
       changeCustomValue: this.changeCustomValue,
       Model: this.props.Model,
@@ -82,8 +74,8 @@ class SchemaDesigner extends React.Component {
     // return message.error(LocaleProvider('valid_json'));
   };
 
-  changeType = (key, e) => {
-    this.props.changeType({ keys: [key], value: e.target.value });
+  changeType = (key, value) => {
+    this.props.changeType({ keys: [key], value });
   };
 
   addChildField = key => {
@@ -168,12 +160,12 @@ class SchemaDesigner extends React.Component {
     this.props.requireAll({ required: e, value: this.props.schema });
   };
 
+  _handleItemClick(type) {
+    console.log('clicked type', type);
+  }
+
   render() {
-    const { checked } = this.state;
     const { schema } = this.props;
-
-    const disabled = schema.type !== 'object' && schema.type !== 'array';
-
     return (
       <div className="json-schema-react-editor">
         {/* {advVisible && (
@@ -192,91 +184,54 @@ class SchemaDesigner extends React.Component {
           </Modal>
         )} */}
 
-        <ListGroup bordered={false}>
-          <ListGroupItem bordered={false} indentLevel={0}>
-            <Col span={8} className="col-item name-item col-item-name">
-              <Row type="flex" justify="space-around" align="middle">
-                <Col span={2} className="down-style-col">
-                  {schema.type === 'object' ? (
-                    <Button
-                      size="small"
-                      onClick={this.clickIcon}
-                      variant="text"
-                      style={!this.state.show ? { transform: `rotate(-90deg)` } : {}}>
-                      <SvgIcon icon="chevron-down" />
-                    </Button>
-                  ) : null}
-                </Col>
-                <Col span={22}>
-                  <div style={{ position: 'relative' }}>
-                    <Input onChange={e => {}} className="form-control" disabled value="root" />
-                  </div>
-                  <Tooltip placement="top" title={'checked_all'}>
-                    <ToggleSwitch
-                      checked={checked}
-                      disabled={disabled}
-                      onChange={this.changeCheckBox}
-                    />
-                  </Tooltip>
-                </Col>
-              </Row>
-            </Col>
-            <Col span={3} className="col-item col-item-type">
-              <select
-                className="type-select-style"
-                onChange={e => this.changeType(`type`, e)}
-                value={schema.type || 'object'}>
-                {SCHEMA_TYPE.map((item, index) => {
-                  return (
-                    <option value={item} key={index}>
-                      {item}
-                    </option>
-                  );
-                })}
-              </select>
-            </Col>
-            <Col span={this.props.isMock ? 4 : 5} className="col-item col-item-mock">
-              <Input
+        <ui.FlexRow>
+          <ui.FlexItem>
+            {schema.type === 'object' && (
+              <ui.StyledActions onClick={() => this.addChildField('properties')}>
+                <SvgIcon icon="plus" />
+              </ui.StyledActions>
+            )}
+            <ui.FlexItem>
+              {schema.type === 'object' && (
+                <ui.StyledNavigate show={this.state.show} onClick={this.clickIcon}>
+                  <SvgIcon icon="chevron-down" />
+                </ui.StyledNavigate>
+              )}
+              <ui.StyledTooltip
+                message={
+                  <SchemaSelectors
+                    selectedItem={schema.type || 'object'}
+                    handleItemClick={e => this.changeType(`type`, e)}
+                  />
+                }
+                position="top">
+                <Button size="small" variant="text">
+                  {schema.type}
+                </Button>
+              </ui.StyledTooltip>
+
+              <ui.FieldInput
                 disabled
                 placeholder={'Title'}
                 value={this.props.schema.title}
                 onChange={e => this.changeValue(['title'], e.target.value)}
               />
-              {/* <SvgIcon
-                    icon="brackets"
-                    onClick={() => this.showEdit([], 'title', this.props.schema.title)
-                    } /> */}
-            </Col>
-            <Col span={this.props.isMock ? 4 : 5} className="col-item col-item-desc">
-              <Input
+
+              <ui.FieldInput
                 disabled
                 placeholder={'description'}
                 value={schema.description}
                 onChange={e => this.changeValue(['description'], e.target.value)}
               />
-              {/* <SvgIcon 
-                    icon="brackets"
-                    onClick={() =>
-                        this.showEdit([], 'description', this.props.schema.description)
-                    } /> */}
-            </Col>
-            <Col span={2} className="col-item col-item-setting">
-              <span className="adv-set" onClick={() => this.showAdv([], this.props.schema)}>
-                <Tooltip placement="top" title={LocaleProvider('adv_setting')}>
-                  <SvgIcon icon="gear" />
-                </Tooltip>
-              </span>
-              {schema.type === 'object' ? (
-                <span onClick={() => this.addChildField('properties')}>
-                  <Tooltip placement="top" title={LocaleProvider('add_child_node')}>
-                    <SvgIcon icon="plus" />
-                  </Tooltip>
-                </span>
-              ) : null}
-            </Col>
-          </ListGroupItem>
-          {this.state.show && <SchemaJson showEdit={this.showEdit} showAdv={this.showAdv} />}
-        </ListGroup>
+            </ui.FlexItem>
+            <ui.StyledActions font={1} onClick={() => this.showAdv([], this.props.schema)}>
+              <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
+                <SvgIcon icon="gear" />
+              </ui.StyledTooltip>
+            </ui.StyledActions>
+          </ui.FlexItem>
+        </ui.FlexRow>
+        {this.state.show && <SchemaJson showEdit={this.showEdit} showAdv={this.showAdv} />}
       </div>
     );
   }
