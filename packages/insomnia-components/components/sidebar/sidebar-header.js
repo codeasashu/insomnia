@@ -61,6 +61,7 @@ const SidebarHeader = ({
   toggleSection,
   toggleFilter,
   sectionVisible,
+  handleAddItem,
   children,
 }: Props) => {
   const handleFilterClick =
@@ -71,17 +72,32 @@ const SidebarHeader = ({
         }
       : undefined;
 
+  const handleAddItemClick =
+    sectionVisible && handleAddItem // only handle a click if the section is open
+      ? e => {
+          e.stopPropagation(); // Prevent a parent from also handling the click
+          handleAddItem();
+        }
+      : undefined;
+
   return (
     <StyledHeader onClick={toggleSection}>
       <h6>{headerTitle}</h6>
       <div>
         {children || (
-          <motion.span
-            onClick={handleFilterClick}
-            initial={{ opacity: sectionVisible ? 0.6 : 0 }}
-            animate={{ opacity: sectionVisible ? 0.6 : 0 }}>
-            <SvgIcon icon={IconEnum.search} />
-          </motion.span>
+          <React.Fragment>
+            {sectionVisible && (
+              <span onClick={handleAddItemClick}>
+                <SvgIcon icon={IconEnum.plus} />
+              </span>
+            )}
+            <motion.span
+              onClick={handleFilterClick}
+              initial={{ opacity: sectionVisible ? 0.6 : 0 }}
+              animate={{ opacity: sectionVisible ? 0.6 : 0 }}>
+              <SvgIcon icon={IconEnum.search} />
+            </motion.span>
+          </React.Fragment>
         )}
       </div>
     </StyledHeader>

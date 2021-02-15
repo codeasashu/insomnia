@@ -22,7 +22,9 @@ type Props = {|
   className?: string,
   jsonData: Object,
   onClick: (section: string, path: any) => void,
+  onAdd: (section: string, path: any) => void,
   onEdit: (section: string, path: any) => void,
+  onDelete: (section: string, path: any) => void,
   jsonData: {
     servers?: Object,
     info?: Object,
@@ -133,20 +135,32 @@ function Sidebar(props: Props) {
       {serversVisible && servers && <SidebarServers servers={servers} onClick={props.onClick} />}
       {pathsVisible && paths && <SidebarPaths paths={paths} onClick={props.onClick} />}
       {requestsVisible && requestBodies && (
-        <SidebarRequests requests={requestBodies} onClick={props.onClick} />
+        <SidebarRequests requests={requestBodies || {}} onClick={props.onClick} />
       )}
       {responsesVisible && responses && (
-        <SidebarResponses responses={responses} onClick={props.onClick} />
+        <SidebarResponses responses={responses || {}} onClick={props.onClick} />
       )}
-      {parametersVisible && parameters && (
-        <SidebarParameters parameters={parameters} onClick={props.onClick} />
+      {parametersVisible && (
+        <SidebarParameters
+          parameters={parameters || {}}
+          onClick={props.onClick}
+          onAdd={props.onAdd}
+          onEdit={props.onEdit}
+          onDelete={props.onDelete}
+        />
       )}
       {headersVisible && headers && <SidebarHeaders headers={headers} onClick={props.onClick} />}
-      {schemasVisible && schemas && (
-        <SidebarSchemas schemas={schemas} onClick={props.onClick} onEdit={props.onEdit} />
+      {schemasVisible && (
+        <SidebarSchemas
+          schemas={schemas || {}}
+          onClick={props.onClick}
+          onAdd={props.onAdd}
+          onEdit={props.onEdit}
+          onDelete={props.onDelete}
+        />
       )}
       {securityVisible && securitySchemes && (
-        <SidebarSecurity security={securitySchemes} onClick={props.onClick} />
+        <SidebarSecurity security={securitySchemes || {}} onClick={props.onClick} />
       )}
     </StyledSidebar>
   );

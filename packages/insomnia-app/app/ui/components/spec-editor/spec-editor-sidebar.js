@@ -81,8 +81,33 @@ class SpecEditorSidebar extends React.Component<Props, State> {
     this._mapPosition(itemPath);
   };
 
-  _handleAddItem = (...itemPath): void => {
-    console.log('not implemented');
+  _handleOnDelete = (...itemPath: Array): void => {
+    const { handleSpecUpdate } = this.props;
+    const spec = this.getSpec();
+    const deleted = _.unset(spec, itemPath);
+    if (deleted) {
+      itemPath.pop();
+      const updatedYamlSpec = YAML.stringify(spec);
+      handleSpecUpdate(updatedYamlSpec);
+      this._mapPosition(itemPath);
+    }
+  };
+
+  _handleAddItem = (title: String, itemPath: Array): void => {
+    const { handleSpecUpdate } = this.props;
+    const defaultSchema = {
+      [title]: {
+        type: 'object',
+        properties: {},
+        required: [],
+      },
+    };
+
+    const spec = this.getSpec();
+    const uspec = _.update(spec, itemPath, n => _.assign(n, defaultSchema));
+    const updatedYamlSpec = YAML.stringify(uspec);
+    handleSpecUpdate(updatedYamlSpec);
+    // this._mapPosition(itemPath);
   };
 
   _handleEditItem = (...itemPath): void => {
@@ -150,6 +175,7 @@ class SpecEditorSidebar extends React.Component<Props, State> {
           onClick={this._handleItemClick}
           onAdd={this._handleAddItem}
           onEdit={this._handleEditItem}
+          onDelete={this._handleOnDelete}
         />
       </StyledSpecEditorSidebar>
     );
