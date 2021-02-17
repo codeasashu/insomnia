@@ -1,6 +1,8 @@
 // @flow
 
 import YAML from 'yaml';
+import _ from 'lodash';
+import { OpenApiBuilder } from './openapi3';
 
 export function parseApiSpec(
   rawDocument: string,
@@ -39,4 +41,63 @@ export function parseApiSpec(
   }
 
   return result;
+}
+
+export const OAS_SECTIONS = {
+  PATH: 'paths',
+  SCHEMA: 'schemas',
+  COMPONENT: 'components',
+  PARAMETERS: 'parameters',
+};
+export class APISpecBuilder {
+  constructor(spec) {
+    this.builder = OpenApiBuilder.create(spec);
+  }
+
+  static create(spec) {
+    if (_.isString(spec)) {
+      try {
+        spec = YAML.parse(spec);
+      } catch (err) {
+        throw new Error('Failed to parse API spec');
+      }
+    }
+    return new APISpecBuilder(spec);
+  }
+
+  getSpec = () => this.builder.getSpec();
+
+  getSpecAsYaml = () => this.builder.getSpecAsYaml();
+
+  addPath = (path, pathItem) => {
+    this.builder.addPath(path, pathItem);
+    return this;
+  };
+
+  isPath = itemPath => itemPath[0] === OAS_SECTIONS.PATH;
+  isSchema = itemPath =>
+    itemPath[0] === OAS_SECTIONS.COMPONENT && itemPath[1] === OAS_SECTIONS.SCHEMA;
+
+  addComponent = (section, name, schema = null) => {
+    if (section === OAS_SECTIONS.SCHEMA) this.builder.addSchema(name, schema);
+    if (section === OAS_SECTIONS.PARAMETERS) this.builder.addParameter(name, schema);
+    return this;
+  };
+
+  _getValue = (haystack, needle, defaultValue = null) => _.get(haystack, needle, defaultValue);
+
+  getOperation = (path, method) => {
+    const pathItem = this.getPathItem(path);
+    return this._getValue(pathItem, method, null);
+  };
+
+  getPathItem = path => {
+    const spec = this.builder.getSpec();
+    return this._getValue(spec, [OAS_SECTIONS.PATH, path], null);
+  };
+
+  getSchema = name => {
+    const spec = this.builder.getSpec();
+    return this._getValue(spec, [OAS_SECTIONS.COMPONENT, OAS_SECTIONS.SCHEMA, name], null);
+  };
 }
