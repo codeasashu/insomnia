@@ -8,9 +8,8 @@ import YAML from 'yaml';
 import YAMLSourceMap from 'yaml-source-map';
 import { Sidebar } from 'insomnia-components';
 import type { ApiSpec } from '../../../models/api-spec';
+import { APISpecBuilder } from '../../../common/api-specs';
 import { trackEvent } from '../../../common/analytics';
-import { showModal } from '../modals';
-import SchemaDesignerModal from '../schema-designer/modals/schema-designer-modal';
 
 type Props = {|
   apiSpec: ApiSpec,
@@ -78,6 +77,7 @@ class SpecEditorSidebar extends React.Component<Props, State> {
   }
 
   _handleItemClick = (...itemPath): void => {
+    this.props.handleClick(itemPath);
     this._mapPosition(itemPath);
   };
 
@@ -93,36 +93,20 @@ class SpecEditorSidebar extends React.Component<Props, State> {
     }
   };
 
-  _handleAddItem = (title: String, itemPath: Array): void => {
+  _handleAddItem = (section, itemPath, ...item: Array): void => {
     const { handleSpecUpdate } = this.props;
-    const defaultSchema = {
-      [title]: {
-        type: 'object',
-        properties: {},
-        required: [],
-      },
-    };
+    if (!itemPath || !item.length) {
+      return;
+    }
 
-    const spec = this.getSpec();
-    const uspec = _.update(spec, itemPath, n => _.assign(n, defaultSchema));
-    const updatedYamlSpec = YAML.stringify(uspec);
-    handleSpecUpdate(updatedYamlSpec);
-    // this._mapPosition(itemPath);
+    if (section === 'components') this.builder.addComponent(itemPath, item[0]);
+    if (section === 'paths') this.builder.addPath(itemPath, item[0]);
+
+    handleSpecUpdate(this.builder.getSpecAsYaml());
   };
 
   _handleEditItem = (...itemPath): void => {
-    const { handleSpecUpdate } = this.props;
-    const schema = this._getSchema(itemPath);
-    showModal(SchemaDesignerModal, {
-      schema,
-      handleOnUpdate: updatedSchema => {
-        const spec = this.getSpec();
-        const uspec = _.set(spec, itemPath, updatedSchema);
-        const updatedYamlSpec = YAML.stringify(uspec);
-        handleSpecUpdate(updatedYamlSpec);
-        this._mapPosition(itemPath);
-      },
-    });
+    console.log('handleEdit item', itemPath);
   };
 
   _updateSpec = (itemPath: Array, schema: Object): Object => {
@@ -149,10 +133,19 @@ class SpecEditorSidebar extends React.Component<Props, State> {
     try {
       JSON.parse(contents);
     } catch (e) {
+      this.builder = APISpecBuilder.create(this.getSpec());
       this.setState({ specContentJSON: false });
       return;
     }
     this.setState({ specContentJSON: true });
+  }
+
+  componentDidUpdate(prevProps) {
+    const specJSON = this.getSpec();
+    const prevSpecJSON = prevProps.apiSpec && YAML.parse(prevProps.apiSpec.contents);
+    if (prevSpecJSON !== specJSON) {
+      this.builder = APISpecBuilder.create(specJSON);
+    }
   }
 
   getSpec(): Object {
@@ -174,7 +167,6 @@ class SpecEditorSidebar extends React.Component<Props, State> {
           jsonData={specJSON}
           onClick={this._handleItemClick}
           onAdd={this._handleAddItem}
-          onEdit={this._handleEditItem}
           onDelete={this._handleOnDelete}
         />
       </StyledSpecEditorSidebar>
