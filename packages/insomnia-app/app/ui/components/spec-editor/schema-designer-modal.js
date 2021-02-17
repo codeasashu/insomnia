@@ -3,12 +3,12 @@
 import React, { PureComponent } from 'react';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
 
-import Modal from '../../base/modal';
-import ModalBody from '../../base/modal-body';
-import ModalHeader from '../../base/modal-header';
-import ModalFooter from '../../base/modal-footer';
+import Modal from '../base/modal';
+import ModalBody from '../base/modal-body';
+import ModalHeader from '../base/modal-header';
+import ModalFooter from '../base/modal-footer';
 
-import SchemaDesignerApp from '../index';
+import SchemaDesignerApp from '../schema-designer';
 
 @autoBindMethodsForReact()
 class SchemaDesignerModal extends PureComponent {

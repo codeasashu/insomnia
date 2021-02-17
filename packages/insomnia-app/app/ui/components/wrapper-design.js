@@ -3,9 +3,11 @@ import * as React from 'react';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
 import type { WrapperProps } from './wrapper';
 import PageLayout from './page-layout';
-import { Button, NoticeTable } from 'insomnia-components';
+import { Button, NoticeTable, SvgIcon } from 'insomnia-components';
 import ErrorBoundary from './error-boundary';
-import SpecEditorSidebar from './spec-editor/spec-editor-sidebar';
+// import SpecEditorSidebar from './spec-editor/spec-editor-sidebar';
+// import { SpecEditorSidebar } from './spec-editor';
+import { SpecEditorSidebar, FormEditor } from './spec-editor';
 import CodeEditor from './codemirror/code-editor';
 import { Spectral } from '@stoplight/spectral';
 import { showModal } from './modals';
@@ -14,6 +16,7 @@ import SwaggerUI from 'swagger-ui-react';
 import type { ApiSpec } from '../../models/api-spec';
 import previewIcon from '../images/icn-eye.svg';
 import generateConfigIcon from '../images/icn-gear.svg';
+
 import * as models from '../../models/index';
 import { parseApiSpec } from '../../common/api-specs';
 import { getConfigGenerators } from '../../plugins';
@@ -52,6 +55,8 @@ class WrapperDesign extends React.PureComponent<Props, State> {
       previewHidden: props.wrapperProps.activeWorkspaceMeta.previewHidden || false,
       lintMessages: [],
       hasConfigPlugins: false,
+      formHidden: props.wrapperProps.activeWorkspaceMeta.formHidden || true,
+      selectedComponent: null,
     };
   }
 
@@ -63,6 +68,10 @@ class WrapperDesign extends React.PureComponent<Props, State> {
 
   _setEditorRef(n: ?CodeEditor) {
     this.editor = n;
+  }
+
+  _setFormRef(n: ?FormEditor) {
+    this.formeditor = n;
   }
 
   async _handleGenerateConfig() {
@@ -77,6 +86,17 @@ class WrapperDesign extends React.PureComponent<Props, State> {
         const workspaceId = this.props.wrapperProps.activeWorkspace._id;
         const previewHidden = this.state.previewHidden;
         await models.workspaceMeta.updateByParentId(workspaceId, { previewHidden });
+      },
+    );
+  }
+
+  async _handleToggleFormview() {
+    await this.setState(
+      prevState => ({ formHidden: !prevState.formHidden }),
+      async () => {
+        const workspaceId = this.props.wrapperProps.activeWorkspace._id;
+        const formHidden = this.state.formHidden;
+        await models.workspaceMeta.updateByParentId(workspaceId, { formHidden });
       },
     );
   }
@@ -164,26 +184,41 @@ class WrapperDesign extends React.PureComponent<Props, State> {
     this._handleOnChange(contents);
   }
 
+  _setCurrentSpecComponent(componentPath) {
+    this.setState({ selectedComponent: componentPath });
+    if (!this.formeditor) return;
+    this.formeditor.updateComponent(componentPath);
+  }
+
   _renderEditor(): React.Node {
     const { activeApiSpec, settings } = this.props.wrapperProps;
-    const { lintMessages } = this.state;
+    const { lintMessages, formHidden, selectedComponent } = this.state;
 
     return (
       <div className="column tall theme--pane__body">
         <div className="tall">
-          <CodeEditor
-            manualPrettify
-            ref={this._setEditorRef}
-            fontSize={settings.editorFontSize}
-            indentSize={settings.editorIndentSize}
-            lineWrapping={settings.lineWrapping}
-            keyMap={settings.editorKeyMap}
-            lintOptions={WrapperDesign.lintOptions}
-            mode="openapi"
-            defaultValue={activeApiSpec.contents}
-            onChange={this._handleOnChange}
-            uniquenessKey={activeApiSpec._id}
-          />
+          {formHidden ? (
+            <CodeEditor
+              manualPrettify
+              ref={this._setEditorRef}
+              fontSize={settings.editorFontSize}
+              indentSize={settings.editorIndentSize}
+              lineWrapping={settings.lineWrapping}
+              keyMap={settings.editorKeyMap}
+              lintOptions={WrapperDesign.lintOptions}
+              mode="openapi"
+              defaultValue={activeApiSpec.contents}
+              onChange={this._handleOnChange}
+              uniquenessKey={activeApiSpec._id}
+            />
+          ) : (
+            <FormEditor
+              component={selectedComponent}
+              ref={this._setFormRef}
+              spec={activeApiSpec.contents}
+              onChange={this._handleOnChange}
+            />
+          )}
         </div>
         {lintMessages.length > 0 && (
           <NoticeTable notices={lintMessages} onClick={this._handleLintClick} />
@@ -242,7 +277,7 @@ class WrapperDesign extends React.PureComponent<Props, State> {
 
   _renderPageHeader() {
     const { wrapperProps, gitSyncDropdown, handleActivityChange } = this.props;
-    const { previewHidden, hasConfigPlugins } = this.state;
+    const { previewHidden, formHidden, hasConfigPlugins } = this.state;
 
     return (
       <WorkspacePageHeader
@@ -253,6 +288,10 @@ class WrapperDesign extends React.PureComponent<Props, State> {
             <Button variant="contained" onClick={this._handleTogglePreview}>
               <img src={previewIcon} alt="Preview" width="15" />
               &nbsp; {previewHidden ? 'Preview: Off' : 'Preview: On'}
+            </Button>
+            <Button variant="contained" onClick={this._handleToggleFormview}>
+              <SvgIcon icon="gui" />
+              &nbsp; {formHidden ? 'Form: Off' : 'Form: On'}
             </Button>
             {hasConfigPlugins && (
               <Button
@@ -289,6 +328,7 @@ class WrapperDesign extends React.PureComponent<Props, State> {
           apiSpec={activeApiSpec}
           handleSetSelection={this._handleSetSelection}
           handleSpecUpdate={this._handleSpecUpdate}
+          handleClick={this._setCurrentSpecComponent}
         />
       </ErrorBoundary>
     );
