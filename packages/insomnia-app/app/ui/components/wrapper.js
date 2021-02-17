@@ -58,7 +58,6 @@ import SyncDeleteModal from './modals/sync-delete-modal';
 import RequestRenderErrorModal from './modals/request-render-error-modal';
 import WorkspaceEnvironmentsEditModal from './modals/workspace-environments-edit-modal';
 import WorkspaceSettingsModal from './modals/workspace-settings-modal';
-import SchemaDesignerModal from './schema-designer/modals/schema-designer-modal';
 import CodePromptModal from './modals/code-prompt-modal';
 import * as db from '../../common/database';
 import * as models from '../../models/index';
@@ -592,7 +591,6 @@ class Wrapper extends React.PureComponent<WrapperProps, State> {
             <PaymentNotificationModal ref={registerModal} />
             <FilterHelpModal ref={registerModal} />
             <RequestRenderErrorModal ref={registerModal} />
-            <SchemaDesignerModal ref={registerModal} />
             <GenerateConfigModal ref={registerModal} settings={settings} />
 
             <CodePromptModal
