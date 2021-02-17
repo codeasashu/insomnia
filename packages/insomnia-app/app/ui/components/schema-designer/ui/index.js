@@ -15,6 +15,35 @@ export const StyledActions = styled.span`
     ${({ height }) => height && `height: ${height};`}
 `;
 
+export const StyledFormInput = styled.div`
+  outline: none;
+  border: 0;
+  margin-bottom: var(--padding-sm);
+  width: 100%;
+  box-sizing: border-box;
+
+  input {
+    border-radius: 0;
+    border-top: 0;
+    border-right: 0;
+    border-left: 0;
+    background: none;
+    padding-left: var(--padding-xxs);
+    padding-right: var(--padding-xxs);
+    border: 1px solid var(--hl-md);
+    padding: var(--padding-sm);
+    width: 100%;
+    display: block;
+    margin-top: var(--padding-xs);
+    box-sizing: border-box;
+    transition: all 130ms ease-out;
+    outline: 0;
+    margin: 0;
+    color: inherit;
+    text-align: left;
+  }
+`;
+
 // export const InlineActions = styled.span`
 //     display: inline-grid;
 //     height: 100%;

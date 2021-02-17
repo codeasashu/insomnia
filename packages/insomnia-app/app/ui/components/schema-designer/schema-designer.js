@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+import { StyledFormInput } from './ui';
 import SchemaRow from './elements/schema-row';
 import SchemaJson from './elements/schema-json';
 
@@ -20,6 +21,7 @@ class SchemaDesigner extends React.Component {
       checked: false,
       editorModalName: '',
       mock: '',
+      title: '',
     };
     this.jsonSchemaData = null;
     this.jsonData = null;
@@ -29,7 +31,9 @@ class SchemaDesigner extends React.Component {
     if (typeof this.props.onChange === 'function' && this.props.schema !== oldProps.schema) {
       const newData = this.props.schema || '';
       const oldData = oldProps.schema || '';
-      console.log('updatedata', newData, oldData);
+      const title = this.state.title || '';
+      newData.title = title;
+      console.log('updatedata', newData);
       if (!_.isEqual(oldData, newData)) return this.props.onChange(newData);
     }
     if (this.props.data && this.props.data !== oldProps.data) {
@@ -46,7 +50,8 @@ class SchemaDesigner extends React.Component {
         properties: {},
       };
     }
-    console.log('initdata', data);
+
+    this.setState({ title: this.props.schema.title || '' });
     this.props.changeEditorSchema({ value: data });
   }
 
@@ -88,6 +93,8 @@ class SchemaDesigner extends React.Component {
 
   handleAdvCancel = () => this.setState({ advVisible: false });
 
+  _handleTitle = e => this.setState({ title: e.target.value });
+
   showAdv = (itemKey, curItemCustomValue) =>
     this.setState({
       advVisible: true,
@@ -97,9 +104,17 @@ class SchemaDesigner extends React.Component {
 
   render() {
     const { schema } = this.props;
-    const { show } = this.state;
+    const { title, show } = this.state;
     return (
       <div className="json-schema-react-editor">
+        <StyledFormInput>
+          <input
+            type="text"
+            placeholder="Enter schema title..."
+            defaultValue={title}
+            onChange={this._handleTitle}
+          />
+        </StyledFormInput>
         <SchemaRow
           show={true}
           schema={schema}
