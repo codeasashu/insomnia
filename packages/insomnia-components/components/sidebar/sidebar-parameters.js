@@ -4,18 +4,22 @@ import Tooltip from '../tooltip';
 import SidebarItem from './sidebar-item';
 import SvgIcon, { IconEnum } from '../svg-icon';
 import SidebarSection from './sidebar-section';
+import SidebarActions from './sidebar-actions';
 import StyledInvalidSection from './sidebar-invalid-section';
 
 type Props = {
   parameters: Object,
   onClick: (section: string, ...args: any) => void,
+  onAdd: (section: string, ...args: any) => void,
+  onEdit: (section: string, ...args: any) => void,
+  onDelete: (section: string, ...args: any) => void,
 };
 
 // Implemented as a class component because of a caveat with render props
 // https://reactjs.org/docs/render-props.html#be-careful-when-using-render-props-with-reactpurecomponent
 export default class SidebarParameters extends React.Component<Props> {
   renderBody = (filter: string): null | React.Node => {
-    const { parameters, onClick } = this.props;
+    const { parameters, onClick, onEdit, onDelete } = this.props;
 
     if (Object.prototype.toString.call(parameters) !== '[object Object]') {
       return <StyledInvalidSection name={'parameter'} />;
@@ -25,7 +29,7 @@ export default class SidebarParameters extends React.Component<Props> {
       parameter.toLowerCase().includes(filter.toLocaleLowerCase()),
     );
 
-    if (!filteredValues.length) {
+    if (Object.keys(parameters).length && !filteredValues.length) {
       return null;
     }
 
@@ -42,6 +46,10 @@ export default class SidebarParameters extends React.Component<Props> {
                   {parameter}
                 </Tooltip>
               </span>
+              <SidebarActions
+                onEdit={() => onEdit('components', 'parameters', parameter)}
+                onDelete={() => onDelete('components', 'parameters', parameter)}
+              />
             </SidebarItem>
           </React.Fragment>
         ))}
@@ -50,6 +58,13 @@ export default class SidebarParameters extends React.Component<Props> {
   };
 
   render() {
-    return <SidebarSection title="PARAMETERS" renderBody={this.renderBody} />;
+    const { onAdd } = this.props;
+    return (
+      <SidebarSection
+        title="PARAMETERS"
+        renderBody={this.renderBody}
+        handleAddItemClick={val => onAdd('components', 'parameters', val)}
+      />
+    );
   }
 }

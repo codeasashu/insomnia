@@ -4,11 +4,15 @@ import SidebarItem from './sidebar-item';
 import SvgIcon, { IconEnum } from '../svg-icon';
 import SidebarSection from './sidebar-section';
 import SidebarBadge from './sidebar-badge';
+import SidebarActions from './sidebar-actions';
 import StyledInvalidSection from './sidebar-invalid-section';
 
 type Props = {
   paths: Object,
   onClick: (section: string, ...args: any) => void,
+  onAdd: (section: string, ...args: any) => void,
+  onEdit: (section: string, ...args: any) => void,
+  onDelete: (section: string, ...args: any) => void,
 };
 
 const isNotXDashKey = key => key.indexOf('x-') !== 0;
@@ -17,7 +21,7 @@ const isNotXDashKey = key => key.indexOf('x-') !== 0;
 // https://reactjs.org/docs/render-props.html#be-careful-when-using-render-props-with-reactpurecomponent
 export default class SidebarPaths extends React.Component<Props> {
   renderBody = (filter: string): null | React.Node => {
-    const { paths, onClick } = this.props;
+    const { paths, onClick, onEdit, onDelete } = this.props;
     let pathItems = {};
     if (typeof paths !== 'string') {
       pathItems = Object.entries(paths || {});
@@ -29,7 +33,7 @@ export default class SidebarPaths extends React.Component<Props> {
       pathDetail[0].toLowerCase().includes(filter.toLocaleLowerCase()),
     );
 
-    if (!filteredValues.length) {
+    if (pathItems.length && !filteredValues.length) {
       return null;
     }
 
@@ -42,6 +46,10 @@ export default class SidebarPaths extends React.Component<Props> {
                 <SvgIcon icon={IconEnum.indentation} />
               </div>
               <span>{route}</span>
+              <SidebarActions
+                onEdit={() => onEdit('paths', route)}
+                onDelete={() => onDelete('paths', route)}
+              />
             </SidebarItem>
             <SidebarItem>
               {Object.keys((routeBody: any))
@@ -60,6 +68,13 @@ export default class SidebarPaths extends React.Component<Props> {
   };
 
   render() {
-    return <SidebarSection title="PATHS" renderBody={this.renderBody} />;
+    const { onAdd } = this.props;
+    return (
+      <SidebarSection
+        title="PATHS"
+        renderBody={this.renderBody}
+        handleAddItemClick={val => onAdd('paths', val, 'get')}
+      />
+    );
   }
 }

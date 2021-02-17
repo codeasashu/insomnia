@@ -133,7 +133,15 @@ function Sidebar(props: Props) {
         </StyledSection>
       )}
       {serversVisible && servers && <SidebarServers servers={servers} onClick={props.onClick} />}
-      {pathsVisible && paths && <SidebarPaths paths={paths} onClick={props.onClick} />}
+      {pathsVisible && (
+        <SidebarPaths
+          paths={paths}
+          onClick={props.onClick}
+          onAdd={props.onAdd}
+          onEdit={props.onEdit}
+          onDelete={props.onDelete}
+        />
+      )}
       {requestsVisible && requestBodies && (
         <SidebarRequests requests={requestBodies || {}} onClick={props.onClick} />
       )}

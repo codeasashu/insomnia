@@ -56,7 +56,7 @@ export default class SidebarSchemas extends React.Component<Props> {
       <SidebarSection
         title="SCHEMAS"
         renderBody={this.renderBody}
-        handleAddItemClick={val => onAdd(val, ['components', 'schemas'])}
+        handleAddItemClick={val => onAdd('components', 'schemas', val)}
       />
     );
   }
