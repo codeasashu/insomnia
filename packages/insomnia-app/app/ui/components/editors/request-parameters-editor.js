@@ -79,6 +79,7 @@ class RequestParametersEditor extends React.PureComponent<Props> {
   render() {
     const {
       bulk,
+      viewType,
       request,
       editorFontSize,
       editorIndentSize,
@@ -103,6 +104,7 @@ class RequestParametersEditor extends React.PureComponent<Props> {
       />
     ) : (
       <KeyValueEditor
+        viewType={viewType}
         sortable
         allowMultiline
         namePlaceholder="name"

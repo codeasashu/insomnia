@@ -28,9 +28,7 @@ import RenderedQueryString from '../rendered-query-string';
 import RequestUrlBar from '../request-url-bar.js';
 import type { Settings } from '../../../models/settings';
 import RequestParametersEditor from '../editors/request-parameters-editor';
-import type { ForceToWorkspace } from '../../redux/modules/helpers';
-import PlaceholderRequestPane from './placeholder-request-pane';
-import { Pane, paneBodyClasses, PaneHeader } from './pane';
+import { Pane, paneBodyClasses, PaneHeader } from '../panes/pane';
 import classnames from 'classnames';
 import { queryAllWorkspaceUrls } from '../../../models/helpers/query-all-workspace-urls';
 
@@ -40,7 +38,6 @@ type Props = {
   forceUpdateRequestHeaders: (r: Request, headers: Array<RequestHeader>) => Promise<Request>,
   handleSend: () => void,
   handleSendAndDownload: (filepath?: string) => Promise<void>,
-  handleCreateRequest: () => Promise<Request>,
   handleGenerateCode: Function,
   handleRender: Function,
   handleGetRenderContext: Function,
@@ -56,7 +53,6 @@ type Props = {
   updateSettingsUseBulkHeaderEditor: Function,
   updateSettingsUseBulkParametersEditor: Function,
   handleImport: Function,
-  handleImportFile: (forceToWorkspace?: ForceToWorkspace) => void,
 
   // Other
   workspace: Workspace,
@@ -133,8 +129,6 @@ class RequestPane extends React.PureComponent<Props> {
       handleGenerateCode,
       handleGetRenderContext,
       handleImport,
-      handleImportFile,
-      handleCreateRequest,
       handleRender,
       handleSend,
       handleSendAndDownload,
@@ -157,16 +151,8 @@ class RequestPane extends React.PureComponent<Props> {
       downloadPath,
     } = this.props;
 
-    const hotKeyRegistry = settings.hotKeyRegistry;
-
     if (!request) {
-      return (
-        <PlaceholderRequestPane
-          hotKeyRegistry={hotKeyRegistry}
-          handleImportFile={handleImportFile}
-          handleCreateRequest={handleCreateRequest}
-        />
-      );
+      return <p>Create Request First</p>;
     }
 
     let numBodyParams = 0;
@@ -300,6 +286,7 @@ class RequestPane extends React.PureComponent<Props> {
                 key={uniqueKey}
                 errorClassName="tall wide vertically-align font-error pad text-center">
                 <RequestParametersEditor
+                  viewType={'schema'}
                   key={headerEditorKey}
                   handleRender={handleRender}
                   handleGetRenderContext={handleGetRenderContext}
@@ -331,6 +318,7 @@ class RequestPane extends React.PureComponent<Props> {
           <TabPanel className="react-tabs__tab-panel header-editor">
             <ErrorBoundary key={uniqueKey} errorClassName="font-error pad text-center">
               <RequestHeadersEditor
+                viewType={'schema'}
                 key={headerEditorKey}
                 handleRender={handleRender}
                 handleGetRenderContext={handleGetRenderContext}
