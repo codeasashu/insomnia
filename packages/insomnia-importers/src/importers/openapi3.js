@@ -493,12 +493,14 @@ function prepareBody(endpointSchema) {
     return {
       mimeType: MIMETYPE_JSON,
       text,
+      schema: bodyParameter.schema,
     };
   }
 
   if (mimeTypes && mimeTypes.length && mimeTypes[0] !== MIMETYPE_LITERALLY_ANYTHING) {
     return {
       mimeType: mimeTypes[0] || undefined,
+      schema: null,
     };
   } else {
     return {};
@@ -518,6 +520,7 @@ function convertParameters(parameters) {
       name,
       disabled: required !== true,
       value: `${generateParameterExample(schema)}`,
+      schema,
     };
   });
 }

@@ -101,6 +101,7 @@ class RequestHeadersEditor extends React.PureComponent<Props> {
   render() {
     const {
       bulk,
+      viewType,
       request,
       editorFontSize,
       editorIndentSize,
@@ -130,6 +131,7 @@ class RequestHeadersEditor extends React.PureComponent<Props> {
         <div className="scrollable">
           <KeyValueEditor
             sortable
+            viewType={viewType}
             namePlaceholder="header"
             valuePlaceholder="value"
             descriptionPlaceholder="description"

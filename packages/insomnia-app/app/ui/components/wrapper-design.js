@@ -217,6 +217,7 @@ class WrapperDesign extends React.PureComponent<Props, State> {
               ref={this._setFormRef}
               spec={activeApiSpec.contents}
               onChange={this._handleOnChange}
+              wrapperProps={this.props.wrapperProps}
             />
           )}
         </div>

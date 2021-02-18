@@ -80,7 +80,7 @@ class FormEditor extends React.PureComponent {
 
   render() {
     const componentItem = this.getComponent(this.state.component);
-    return <div>{componentItem}</div>;
+    return componentItem;
   }
 }
 

@@ -357,6 +357,7 @@ class Editor extends PureComponent {
     const {
       maxPairs,
       className,
+      viewType,
       valueInputType,
       valuePlaceholder,
       namePlaceholder,
@@ -386,6 +387,7 @@ class Editor extends PureComponent {
               index={i} // For dragging
               ref={this._setRowRef}
               sortable={sortable}
+              viewType={viewType}
               displayDescription={this.state.displayDescription}
               namePlaceholder={namePlaceholder}
               valuePlaceholder={valuePlaceholder}

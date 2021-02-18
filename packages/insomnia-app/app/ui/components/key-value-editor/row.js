@@ -73,6 +73,10 @@ class KeyValueEditorRow extends PureComponent {
     this._sendChange({ name });
   }
 
+  _handleSchemaChange(schema) {
+    this._sendChange({ schema });
+  }
+
   _handleValuePaste(e) {
     if (!this.props.allowMultiline) {
       return;
@@ -236,6 +240,7 @@ class KeyValueEditorRow extends PureComponent {
   renderPairValue() {
     const {
       pair,
+      viewType,
       readOnly,
       forceInput,
       valueInputType,
@@ -276,6 +281,9 @@ class KeyValueEditorRow extends PureComponent {
           type={valueInputType || 'text'}
           placeholder={valuePlaceholder || 'Value'}
           defaultValue={pair.value}
+          viewType={viewType}
+          schema={pair.schema || { type: 'string' }}
+          onSchemaChange={this._handleSchemaChange}
           onPaste={this._handleValuePaste}
           onChange={this._handleValueChange}
           onBlur={this._handleBlurValue}

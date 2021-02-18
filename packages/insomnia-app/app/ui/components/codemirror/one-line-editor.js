@@ -9,6 +9,7 @@ import Input from '../base/debounced-input';
 
 const MODE_INPUT = 'input';
 const MODE_EDITOR = 'editor';
+const MODE_SCHEMA = 'schema';
 const TYPE_TEXT = 'text';
 const NUNJUCKS_REGEX = /({%|%}|{{|}})/;
 
@@ -17,20 +18,26 @@ class OneLineEditor extends PureComponent {
   constructor(props) {
     super(props);
 
+    const mode = this.determineMode(props);
+    this.state = {
+      mode,
+    };
+  }
+
+  determineMode(props) {
     let mode;
-    if (props.forceInput) {
+    if (props.forceInput && props.viewType !== MODE_SCHEMA) {
       mode = MODE_INPUT;
     } else if (props.forceEditor) {
       mode = MODE_EDITOR;
     } else if (this._mayContainNunjucks(props.defaultValue)) {
       mode = MODE_EDITOR;
+    } else if (props.viewType === MODE_SCHEMA) {
+      mode = MODE_SCHEMA;
     } else {
       mode = MODE_INPUT;
     }
-
-    this.state = {
-      mode,
-    };
+    return mode;
   }
 
   focus(setToEnd = false) {
@@ -172,6 +179,11 @@ class OneLineEditor extends PureComponent {
     this.props.onChange && this.props.onChange(value);
   }
 
+  _handleSchemaChange(e) {
+    const schema = { type: e.target.value };
+    this.props.onSchemaChange && this.props.onSchemaChange(schema);
+  }
+
   _handleInputKeyDown(e) {
     if (this.props.onKeyDown) {
       this.props.onKeyDown(e, e.target.value);
@@ -289,6 +301,14 @@ class OneLineEditor extends PureComponent {
     return !!text.match(NUNJUCKS_REGEX);
   }
 
+  get schemaType() {
+    const { schema } = this.props;
+    const isValidSchemaObject =
+      String(Object.prototype.toString.call(schema)) === '[object Object]' &&
+      Object.prototype.hasOwnProperty.call(schema, 'type');
+    return isValidSchemaObject ? schema.type : '';
+  }
+
   render() {
     const {
       id,
@@ -310,6 +330,7 @@ class OneLineEditor extends PureComponent {
 
     const type = originalType || TYPE_TEXT;
     const showEditor = mode === MODE_EDITOR;
+    const showSchema = mode === MODE_SCHEMA;
 
     if (showEditor) {
       return (
@@ -344,6 +365,14 @@ class OneLineEditor extends PureComponent {
             isVariableUncovered={isVariableUncovered}
           />
         </React.Fragment>
+      );
+    } else if (showSchema) {
+      return (
+        <select id="lang" onChange={this._handleSchemaChange} value={this.schemaType}>
+          <option value="">Select</option>
+          <option value="string">String</option>
+          <option value="number">Number</option>
+        </select>
       );
     } else {
       return (
