@@ -1,17 +1,19 @@
 import * as React from 'react';
+import { cold } from 'react-hot-loader';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import SchemaDesignerApp from '../../schema-designer';
+// import SchemaDesignerApp from '../../schema-designer';
+import ReactOpenapiDesigner from 'react-openapi-designer';
 
 @autoBindMethodsForReact()
 class SchemaForm extends React.PureComponent {
   render() {
     const { schema, handleChange } = this.props;
     return (
-      <React.Fragment>
-        <SchemaDesignerApp data={schema} onChange={handleChange} />
-      </React.Fragment>
+      <div>
+        <ReactOpenapiDesigner.Schema dark schema={schema} onChange={handleChange} />
+      </div>
     );
   }
 }
 
-export default SchemaForm;
+export default cold(SchemaForm);
