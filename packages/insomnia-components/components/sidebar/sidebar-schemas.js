@@ -36,9 +36,7 @@ export default class SidebarSchemas extends React.Component<Props> {
       <div>
         {filteredValues.map(schema => (
           <SidebarItem key={schema} onClick={() => onClick('components', 'schemas', schema)}>
-            <div>
-              <SvgIcon icon={IconEnum.brackets} />
-            </div>
+            <SvgIcon icon={IconEnum.brackets} />
             <span>{schema}</span>
             <SidebarActions
               onEdit={() => onEdit('components', 'schemas', schema)}

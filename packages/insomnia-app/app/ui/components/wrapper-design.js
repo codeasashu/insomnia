@@ -71,8 +71,8 @@ class WrapperDesign extends React.PureComponent<Props, State> {
   }
 
   async _handleGenerateConfig() {
-    const { activeApiSpec } = this.props.wrapperProps;
-    showModal(GenerateConfigModal, { apiSpec: activeApiSpec });
+    // const { activeApiSpec } = this.props.wrapperProps;
+    // showModal(GenerateConfigModal, { apiSpec: activeApiSpec });
   }
 
   async _handleTogglePreview() {
@@ -167,6 +167,7 @@ class WrapperDesign extends React.PureComponent<Props, State> {
   }
 
   _handleSpecUpdate(contents: string) {
+    this._handleOnChange(contents);
     const editor = this.editor;
 
     if (!editor) {
@@ -174,7 +175,6 @@ class WrapperDesign extends React.PureComponent<Props, State> {
     }
 
     this.editor._codemirrorSetValue(contents);
-    this._handleOnChange(contents);
   }
 
   _setCurrentSpecComponent(componentPath) {

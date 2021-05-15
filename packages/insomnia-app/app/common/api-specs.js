@@ -46,6 +46,7 @@ export function parseApiSpec(
 export const OAS_SECTIONS = {
   PATH: 'paths',
   SCHEMA: 'schemas',
+  RESPONSE: 'responses',
   COMPONENT: 'components',
   PARAMETERS: 'parameters',
 };
@@ -78,9 +79,14 @@ export class APISpecBuilder {
   isSchema = itemPath =>
     itemPath[0] === OAS_SECTIONS.COMPONENT && itemPath[1] === OAS_SECTIONS.SCHEMA;
 
+  isResponse = itemPath =>
+    itemPath[0] === OAS_SECTIONS.COMPONENT && itemPath[1] === OAS_SECTIONS.RESPONSE;
+
   addComponent = (section, name, schema = null) => {
+    console.log('addComponent', section, name, schema);
     if (section === OAS_SECTIONS.SCHEMA) this.builder.addSchema(name, schema);
     if (section === OAS_SECTIONS.PARAMETERS) this.builder.addParameter(name, schema);
+    if (section === OAS_SECTIONS.RESPONSE) this.builder.addResponse(name, schema);
     return this;
   };
 
@@ -99,5 +105,10 @@ export class APISpecBuilder {
   getSchema = name => {
     const spec = this.builder.getSpec();
     return this._getValue(spec, [OAS_SECTIONS.COMPONENT, OAS_SECTIONS.SCHEMA, name], null);
+  };
+
+  getResponse = name => {
+    const spec = this.builder.getSpec();
+    return this._getValue(spec, [OAS_SECTIONS.COMPONENT, OAS_SECTIONS.RESPONSE, name], null);
   };
 }

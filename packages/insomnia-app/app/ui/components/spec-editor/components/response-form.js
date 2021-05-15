@@ -1,19 +1,18 @@
 import * as React from 'react';
-import { cold } from 'react-hot-loader';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
-// import SchemaDesignerApp from '../../schema-designer';
 import ReactOpenapiDesigner from 'react-openapi-designer';
 
 @autoBindMethodsForReact()
-class SchemaForm extends React.Component {
+class ResponseForm extends React.PureComponent {
   render() {
     const { schema, handleChange } = this.props;
+    console.log('response schema', schema);
     return (
       <div>
-        <ReactOpenapiDesigner.Schema dark schema={schema} onChange={handleChange} />
+        <ReactOpenapiDesigner.Response dark schema={schema} onChange={handleChange} />
       </div>
     );
   }
 }
 
-export default cold(SchemaForm);
+export default ResponseForm;

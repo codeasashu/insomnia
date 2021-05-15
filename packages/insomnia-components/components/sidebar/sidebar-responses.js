@@ -8,6 +8,7 @@ import StyledInvalidSection from './sidebar-invalid-section';
 
 type Props = {
   responses: Object,
+  onAdd: (section: string, ...args: any) => void,
   onClick: (section: string, ...args: any) => void,
 };
 
@@ -48,6 +49,13 @@ export default class SidebarResponses extends React.Component<Props> {
   };
 
   render() {
-    return <SidebarSection title="RESPONSES" renderBody={this.renderBody} />;
+    const { onAdd } = this.props;
+    return (
+      <SidebarSection
+        title="RESPONSES"
+        renderBody={this.renderBody}
+        handleAddItemClick={val => onAdd('components', 'responses', val)}
+      />
+    );
   }
 }

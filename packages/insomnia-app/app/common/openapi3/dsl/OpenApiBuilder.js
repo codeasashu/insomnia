@@ -115,6 +115,16 @@ class OpenApiBuilder {
   }
 
   addResponse(name, response) {
+    response = response || {
+      description: '',
+      content: {
+        'application/json': {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+    };
     this.rootDoc.components.responses[name] = response;
     return this;
   }

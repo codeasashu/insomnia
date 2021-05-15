@@ -146,7 +146,7 @@ function Sidebar(props: Props) {
         <SidebarRequests requests={requestBodies || {}} onClick={props.onClick} />
       )}
       {responsesVisible && responses && (
-        <SidebarResponses responses={responses || {}} onClick={props.onClick} />
+        <SidebarResponses responses={responses || {}} onClick={props.onClick} onAdd={props.onAdd} />
       )}
       {parametersVisible && (
         <SidebarParameters

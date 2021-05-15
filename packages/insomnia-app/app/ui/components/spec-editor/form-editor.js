@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { APISpecBuilder, OAS_SECTIONS } from '../../../common/api-specs';
 import PathForm from './components/path-form';
 import SchemaForm from './components/schema-form';
+import ResponseForm from './components/response-form';
 
 const PickLeft = <p>Select a component from left</p>;
 
@@ -23,6 +24,11 @@ class FormEditor extends React.PureComponent {
 
   getSchemaProps = itemPath => {
     const schema = this.builder.getSchema(itemPath[2]);
+    return { name: itemPath[2], schema };
+  };
+
+  getResponseProps = itemPath => {
+    const schema = this.builder.getResponse(itemPath[2]);
     return { name: itemPath[2], schema };
   };
 
@@ -56,6 +62,8 @@ class FormEditor extends React.PureComponent {
         return <PathForm {...childProps} />;
       case OAS_SECTIONS.SCHEMA:
         return <SchemaForm {...childProps} />;
+      case OAS_SECTIONS.RESPONSE:
+        return <ResponseForm {...childProps} />;
       default:
         return <PickLeft />;
     }
@@ -73,6 +81,10 @@ class FormEditor extends React.PureComponent {
     }
     if (component.length > 2 && this.builder.isSchema(component)) {
       args = { section: OAS_SECTIONS.SCHEMA, props: this.getSchemaProps };
+    }
+
+    if (component.length > 2 && this.builder.isResponse(component)) {
+      args = { section: OAS_SECTIONS.RESPONSE, props: this.getResponseProps };
     }
 
     return this.getRenderer(args.section, args.props, component);
